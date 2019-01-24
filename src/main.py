@@ -282,7 +282,7 @@ def main():
     parser.add_argument('-embed')
     parser.add_argument('-vocab_size', default=400001, type=int)
     parser.add_argument('-load_model',type=str,default=None)# saved model(chkpt) dir
-    parser.add_argument('-task', choices=['KNRM', 'CKNRM', 'MAXPOOL', 'AVGPOOL', 'LSTM', 'KNRM_E', 'CKNRM_E', 'MHKNRM'])
+    parser.add_argument('-task', choices=['KNRM', 'CKNRM', 'MAXPOOL', 'AVGPOOL', 'LSTM'])
     parser.add_argument('-eval_step', type=int, default=1000)
     parser.add_argument('-epoch', type=int, default=1)
     parser.add_argument('-d_word_vec', type=int, default=300)
