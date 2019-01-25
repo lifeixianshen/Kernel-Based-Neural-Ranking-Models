@@ -23,7 +23,7 @@ The main codes and running instructions can be found [here](https://github.com/t
 
 The codes provide models including `KNRM`, `CKNRM`, `MAXPOOL`, `AVGPOOL`, `LSTM`.
 
-- KNRM: [End-to-End Neural Ad-hoc Ranking with Kernel Pooling](https://arxiv.org/abs/1706.06613) https://dl.acm.org/citation.cfm?doid=3159652.3159659. Additionally introduced idf information.
+- KNRM: [End-to-End Neural Ad-hoc Ranking with Kernel Pooling](https://arxiv.org/abs/1706.06613). Additionally introduced idf information.
 - CKNRM: [Convolutional Neural Networks for Soft-Matching N-Grams in Ad-hoc Search](https://dl.acm.org/citation.cfm?doid=3159652.3159659). Additionally introduced idf information.
 - MAXPOOL: Calculate the **max** value on the query embedding vectors and document embedding vectors, then use cos_similarity to measure the similarity.
 - AVGPOOL: Calculate the **mean** value on the query embedding vectors and document embedding vectors, then use cos_similarity to measure the similarity.
