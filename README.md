@@ -1,53 +1,53 @@
 # Kernel-Based-Neural-Ranking-Models
 
-This is the repository of the codes of the **Neural Kernel Match IR** methods on the MSMARCO Passage Reranking Task.
+This is the repository of the codes of the **Neural Kernel Match IR** methods on the [MSMARCO Passage Reranking Task](http://www.msmarco.org/leaders.aspx).
+
+| Rank (Jan 25th 2019) | MSMARCO Passage Re-Ranking         | Eval MRR@10 | Eval MRR@10 |
+| -------------------- | ---------------------------------- | ----------- | ----------- |
+| 4th                  | Neural Kernel Match IR (Conv-KNRM) | 27.12       | 29.02       |
+| 5th                  | Neural Kernel Match IR (KNRM)      | 19.82       | 21.84       |
+
+### Environment Requirement
+
+- Python3
+
+- PyTorch 0.4.1
 
 ### Data Download & Preparation
 
-All the data is located in the `/data` folder. You can run the script to automatically download and preprocess the data:
+To download and prepare the training data, see [here](https://github.com/thunlp/Kernel-Based-Neural-Ranking-Models/tree/master/data).
 
-```shell
-cd data
-./data_preparation.sh
-cd ..
-```
+### Model
 
-Within the above script, it downloads the data from MSMARCO website and preprocesses with the `tokenize_train.py` and `tokenize_dev.py`. The code uses the tokenization method provided by the MSMARCO BM25 Baseline, and converts the tokenized terms into indexes according to `vocab.tsv`. 
+The main codes and running instructions can be found [here](https://github.com/thunlp/Kernel-Based-Neural-Ranking-Models/tree/master/src).
 
-The `vocab.tsv` was generated on the MSMARCO train & dev set with words appeared at least 5 times. You can also generate your own vocab file via `gen_vocab.py`.
+The codes provide models including `KNRM`, `CKNRM`, `MAXPOOL`, `AVGPOOL`, `LSTM`.
 
-The `idf.norm.tsv` is the normed idf value calculated on the whole MSMARCO train & dev corpora.
+- KNRM: [End-to-End Neural Ad-hoc Ranking with Kernel Pooling](https://arxiv.org/abs/1706.06613) https://dl.acm.org/citation.cfm?doid=3159652.3159659. Additionally introduced idf information.
+- CKNRM: [Convolutional Neural Networks for Soft-Matching N-Grams in Ad-hoc Search](https://dl.acm.org/citation.cfm?doid=3159652.3159659). Additionally introduced idf information.
+- MAXPOOL: Calculate the **max** value on the query embedding vectors and document embedding vectors, then use cos_similarity to measure the similarity.
+- AVGPOOL: Calculate the **mean** value on the query embedding vectors and document embedding vectors, then use cos_similarity to measure the similarity.
+- LSTM: Encode the query embedding vectors and document embedding vectors using RNN, then use cos_similarity to measure the similarity.
 
-### Train & Forward
+### Reproduce the Leaderboard Result
 
-The main codes are stored in the `src` folder.
+- Neural Kernel Match IR (Conv-KNRM)
 
-The following commands are used for training and testing:
+  This is the result on ensembling 8 Conv-KNRM models. The code for ensembling is located [here](https://github.com/thunlp/Kernel-Based-Neural-Ranking-Models/src/#ensembling-model).
 
-```shell
-# Train
-CUDA_VISIBLE_DEVICES=$GPU_ID python main.py -train_data $TrainFile -val_data $DevFile -task $Option -batch_size $BATCHSIZE -save_model $SaveModelName -vocab_size $VocabSize
+  Checkpoints can be found [here](https://github.com/thunlp/Kernel-Based-Neural-Ranking-Models/chkpt).
 
-# Forward
-CUDA_VISIBLE_DEVICES=$GPU_ID python main.py -test_data $TestFile -task $Option -batch_size $BATCHSIZE -load_model $SaveModelName.chkpt -vocab_size 315370 -mode forward
 
-# Train eg.
-CUDA_VISIBLE_DEVICES=0 python main.py -train_data ../data/train.txt -val_data ../data/dev_part.txt -task CKNRM -batch_size 64 -save_model CKNRM -vocab_size 315370
+- Neural Kernel Match IR (KNRM)
 
-# Forward eg.
-CUDA_VISIBLE_DEVICES=0 python main.py -test_data ../data/dev.txt -task CKNRM -batch_size 512 -load_model CKNRM.chkpt -vocab_size 315370 -mode forward
-```
+  This is the result on the KNRM model with `glove.6b.300d` pretrained embedding. You can use the `-embed` option to load the pretrained embedding file:
 
-The `$Option` includes `KNRM`, `CKNRM`, `MEANPOOL`, `AVGPOOL`, `LSTM`.
+  ```shell
+  # eg.
+  CUDA_VISIBLE_DEVICES=0 python main.py -train_data ../data/train.txt -val_data ../data/dev_part.txt -task KNRM -batch_size 64 -save_model CKNRM -vocab_size 315370 -embed ../chkpt/embed.npy
+  ```
 
-For ensembled model, you should train the model several times (e.g. the submission on conv-KNRM is ensembled with 8 times training). For simplicity, you can use the following scripts to run the training or testing code.
+### Contact
 
-```shell
-# Train
-./train_ensemble.sh $GPU_ID $RUN_ID_Start $RUN_ID_End # eg ./train_ensemble 0 0 7
+If you have any questions, suggestions or bug reports, please email at qiaoyf96@gmail.com.
 
-# Forward
-./eval_ensemble.sh $GPU_ID $RUN_ID_Start $RUN_ID_End # eg ./eval_ensemble 0 0 7
-```
-
-Then the `eval_ensemble.py` can merge the results of these models by calculating the average score.
