@@ -33,9 +33,9 @@ The codes provide models including `KNRM`, `CKNRM`, `MAXPOOL`, `AVGPOOL`, `LSTM`
 
 - Neural Kernel Match IR (Conv-KNRM)
 
-  This is the result on ensembling 8 Conv-KNRM models. The code for ensembling is located [here](https://github.com/thunlp/Kernel-Based-Neural-Ranking-Models/src/#ensembling-model).
+  This is the result on ensembling 8 Conv-KNRM models. The code for ensembling is located [here](https://github.com/thunlp/Kernel-Based-Neural-Ranking-Models/tree/master/src#ensembling-model).
 
-  Checkpoints can be found [here](https://github.com/thunlp/Kernel-Based-Neural-Ranking-Models/chkpt).
+  Checkpoints can be found [here](https://github.com/thunlp/Kernel-Based-Neural-Ranking-Models/tree/master/chkpt).
 
 
 - Neural Kernel Match IR (KNRM)
