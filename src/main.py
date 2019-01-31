@@ -180,8 +180,9 @@ def train(model, opt, crit, optimizer, train_data, dev_data, test_data):
             #if(step>=14000 and opt.eval_step!= 200):
             #    opt.eval_step=200 # make it smaller 2000--->200
             # opt.eval_step= 10
-            if step > 60000:
-                break
+            if opt.is_ensemble:
+                if step > 60000:
+                    break
             if step % opt.eval_step == 0:
                 time_step=datetime.now()-time_epstart
                 print(' Epoch %d Training step %d loss %f this epoch time %s' %(epoch_i, step, total_loss,time_step))
@@ -290,6 +291,7 @@ def main():
     parser.add_argument('-lr', type=float, default=0.001)
     parser.add_argument('-n_bins', type=int, default=21)
     parser.add_argument('-name', type=int, default=1)
+    parser.add_argument('-is_ensemble', type=bool, default=False)
 
     opt = parser.parse_args()
     opt.cuda = not opt.no_cuda
