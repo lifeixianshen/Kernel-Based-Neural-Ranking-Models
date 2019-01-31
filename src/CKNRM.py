@@ -44,7 +44,7 @@ class cknrm(nn.Module):
         :param mu: |d| * 1 dimension mu
         :param sigma: |d| * 1 dimension sigma
         """
-        super(knrm, self).__init__()
+        super(cknrm, self).__init__()
         tensor_mu = torch.FloatTensor(opt.mu)
         tensor_sigma = torch.FloatTensor(opt.sigma)
         if opt.cuda:
