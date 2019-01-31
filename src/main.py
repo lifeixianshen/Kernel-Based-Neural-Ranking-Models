@@ -6,13 +6,10 @@ import argparse
 import pickle
 import csv
 import KNRM
-import KNRM_ensemble
 import CKNRM
-import CKNRM_ensemble
 import AVGPOOL
 import MAXPOOL
 import LSTM
-import mhknrm
 
 import sys
 #import json
