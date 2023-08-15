@@ -34,7 +34,7 @@ class maxpool(nn.Module):
     def max_score(self, inputs_d, inputs_q, mask_d, mask_q):
         q_embed = self.word_emb(inputs_q)
         d_embed = self.word_emb(inputs_d)
-        
+
         q_embed_norm = F.normalize(q_embed, 2, 2)
         d_embed_norm = F.normalize(d_embed, 2, 2)
 
@@ -46,18 +46,16 @@ class maxpool(nn.Module):
 
         q_embed_norm = q_embed_norm.permute(0, 2, 1)
         d_embed_norm = d_embed_norm.permute(0, 2, 1)
-        
+
         maxop_q = nn.MaxPool1d(q_embed_norm.shape[2])
         maxq = maxop_q(q_embed_norm).squeeze()
-        
+
         maxop_d = nn.MaxPool1d(d_embed_norm.shape[2])
         maxd = maxop_d(d_embed_norm).squeeze()
-        
+
         pdist = nn.CosineSimilarity()
 
-        output = pdist(maxq, maxd).unsqueeze(1)
-
-        return output
+        return pdist(maxq, maxd).unsqueeze(1)
 
     def forward(self, inputs_d, inputs_q, mask_d, mask_q, is_training=False):
         d_score = self.max_score(inputs_d, inputs_q, mask_d, mask_q)

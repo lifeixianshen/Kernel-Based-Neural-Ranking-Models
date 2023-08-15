@@ -14,7 +14,7 @@ import numpy as np
 def get_idf(vocab_size):
     UNKNOWN_TOKEN = '<UNK>'
     PAD_TOKEN = '<PAD>'
-    vocab_dict = dict()
+    vocab_dict = {}
     vof=open('../data/vocab.tsv',mode='r')
     for line in vof:
         word = line.strip('\n')
@@ -111,7 +111,7 @@ class cknrm(nn.Module):
         attn_bi = torch.transpose(torch.squeeze(self.attn_bi(attn.view(inputs_qwt.size()[0], 1, -1, 1)), 3), 1, 2)
         qwt_embed = torch.transpose(torch.squeeze(self.conv_tri(qw_embed.view(inputs_qwt.size()[0], 1, -1, self.d_word_vec))), 1, 2) + 0.000000001
         attn_tri = torch.transpose(torch.squeeze(self.attn_tri(attn.view(inputs_qwt.size()[0], 1, -1, 1)), 3), 1, 2)
-        
+
         dwu_embed = torch.squeeze(self.conv_uni(dw_embed.view(inputs_dwt.size()[0], 1, -1, self.d_word_vec))) + 0.000000001
         dwb_embed = torch.squeeze(self.conv_bi (dw_embed.view(inputs_dwt.size()[0], 1, -1, self.d_word_vec))) + 0.000000001
         dwt_embed = torch.squeeze(self.conv_tri(dw_embed.view(inputs_dwt.size()[0], 1, -1, self.d_word_vec))) + 0.000000001
@@ -123,10 +123,10 @@ class cknrm(nn.Module):
         dwt_embed_norm = F.normalize(dwt_embed, p=2, dim=1, eps=1e-10)
         mask_qw = inputs_qwm.view(inputs_qwt.size()[0], inputs_qwt.size()[1], 1)
         mask_dw = inputs_dwm.view(inputs_dwt.size()[0], 1, inputs_dwt.size()[1], 1)
-        mask_qwu = mask_qw[:, :inputs_qwt.size()[1] - (1 - 1), :] * attn_uni
+        mask_qwu = mask_qw[:, :inputs_qwt.size()[1] - 0, :] * attn_uni
         mask_qwb = mask_qw[:, :inputs_qwt.size()[1] - (2 - 1), :] * attn_bi
         mask_qwt = mask_qw[:, :inputs_qwt.size()[1] - (3 - 1), :] * attn_tri
-        mask_dwu = mask_dw[:, :, :inputs_dwt.size()[1] - (1 - 1), :]
+        mask_dwu = mask_dw[:, :, :inputs_dwt.size()[1] - 0, :]
         mask_dwb = mask_dw[:, :, :inputs_dwt.size()[1] - (2 - 1), :]
         mask_dwt = mask_dw[:, :, :inputs_dwt.size()[1] - (3 - 1), :]
         log_pooling_sum_wwuu = self.get_intersect_matrix(qwu_embed_norm, dwu_embed_norm, mask_qwu, mask_dwu)
@@ -140,6 +140,5 @@ class cknrm(nn.Module):
         log_pooling_sum_wwtb = self.get_intersect_matrix(qwt_embed_norm, dwb_embed_norm, mask_qwt, mask_dwb)
         log_pooling_sum_wwtt = self.get_intersect_matrix(qwt_embed_norm, dwt_embed_norm, mask_qwt, mask_dwt)
         log_pooling_sum = torch.cat([ log_pooling_sum_wwuu, log_pooling_sum_wwut, log_pooling_sum_wwub, log_pooling_sum_wwbu, log_pooling_sum_wwtu,\
-            log_pooling_sum_wwbb, log_pooling_sum_wwbt, log_pooling_sum_wwtb, log_pooling_sum_wwtt], 1)
-        output = torch.squeeze(F.tanh(self.dense_f(log_pooling_sum)), 1)
-        return output
+                log_pooling_sum_wwbb, log_pooling_sum_wwbt, log_pooling_sum_wwtb, log_pooling_sum_wwtt], 1)
+        return torch.squeeze(F.tanh(self.dense_f(log_pooling_sum)), 1)

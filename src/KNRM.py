@@ -14,7 +14,7 @@ import numpy as np
 def get_idf(vocab_size):
     UNKNOWN_TOKEN = '<UNK>'
     PAD_TOKEN = '<PAD>'
-    vocab_dict = dict()
+    vocab_dict = {}
     vof=open('../data/vocab.tsv',mode='r')
     for line in vof:
         word = line.strip('\n')
@@ -86,5 +86,4 @@ class knrm(nn.Module):
         mask_d = mask_d.view(mask_d.size()[0], 1, mask_d.size()[1], 1)
         mask_q = mask_q.view(mask_q.size()[0], mask_q.size()[1], 1)
         log_pooling_sum = self.get_intersect_matrix(q_embed_norm, d_embed_norm, mask_q * attn_q, mask_d)
-        output = torch.squeeze(F.tanh(self.dense(log_pooling_sum)), 1)
-        return output
+        return torch.squeeze(F.tanh(self.dense(log_pooling_sum)), 1)

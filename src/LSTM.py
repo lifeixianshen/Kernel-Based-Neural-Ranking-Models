@@ -42,7 +42,7 @@ class lstm(nn.Module):
         d_embed_norm = F.normalize(d_embed, 2, 2)
         mask_d = mask_d.view(mask_d.size()[0], mask_d.size()[1], 1)
         mask_q = mask_q.view(mask_q.size()[0], mask_q.size()[1], 1)
-        
+
         hidden = Variable(torch.zeros(self.n_layers * (2 if self.bi_rnn else 1), q_embed_norm.size()[0], self.hidden_size))
         hidden = hidden.cuda() if self.cuda else hidden
 
@@ -67,5 +67,4 @@ class lstm(nn.Module):
 
         concated = torch.cat((outputq, outputt),1)
 
-        output_lstm = self.linear(concated).squeeze(1)
-        return output_lstm
+        return self.linear(concated).squeeze(1)

@@ -16,7 +16,7 @@ import math
 def get_idf(vocab_size):
     UNKNOWN_TOKEN = '<UNK>'
     PAD_TOKEN = '<PAD>'
-    vocab_dict = dict()
+    vocab_dict = {}
     vof=open('../data/vocab.tsv',mode='r')
     for line in vof:
         word = line.strip('\n')
@@ -32,7 +32,7 @@ def get_idf(vocab_size):
         line = line.strip().split('\t')
         if line[0] in vocab_dict:
             attn[vocab_dict[line[0]]] = float(line[1])
-    
+
     return np.array(attn)
 
 class avgpool(nn.Module):
@@ -61,7 +61,7 @@ class avgpool(nn.Module):
 
         q_embed = self.word_emb(inputs_q)
         d_embed = self.word_emb(inputs_d)
-        
+
         q_embed_norm = F.normalize(q_embed, 2, 2)
         d_embed_norm = F.normalize(d_embed, 2, 2)
 
@@ -74,12 +74,10 @@ class avgpool(nn.Module):
 
         length_d = torch.sum(mask_d, dim=1)
         avgd = torch.sum(d_embed_norm * mask_d * attn_d, 1) / length_d.view(length_d.shape[0], 1)
-        
+
         pdist = nn.CosineSimilarity()
 
-        output = pdist(avgq, avgd).unsqueeze(1)
-
-        return output
+        return pdist(avgq, avgd).unsqueeze(1)
 
     def forward(self, inputs_d, inputs_q, mask_d, mask_q, is_training=False):
         d_score = self.avg_score(inputs_d, inputs_q, mask_d, mask_q)

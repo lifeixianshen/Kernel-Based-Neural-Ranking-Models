@@ -34,7 +34,7 @@ def get_qrels(QRELS_DEV):
     return qrels
 
 def data_forward(model, forward_data, output_dir, raw_output):
-    result_dict=dict()
+    result_dict = {}
     writer = open(output_dir,'w')
     fout = open(raw_output, 'w')
     for idx, batch in enumerate(forward_data):
@@ -95,7 +95,7 @@ def data_forward(model, forward_data, output_dir, raw_output):
     print('len of scored dict:',len(result_dict))
 
 def data_evaluate(model, evaluate_data, flag, qrels):
-    eval_dict = dict()
+    eval_dict = {}
     c_1_j = 0
     c_2_j = 0
     reduce_num = 0
@@ -139,8 +139,8 @@ def data_evaluate(model, evaluate_data, flag, qrels):
     #print ""
     #print(" evaluate on " + flag + " MAP: %f" % MAP)
     #print(" evaluate on " + flag + ' MRR: %f' % MRR)
-    logging.info(" evaluate on " + flag + " MAP: %f" % MAP)
-    logging.info(" evaluate on " + flag + ' MRR: %f' % MRR)
+    logging.info(f" evaluate on {flag}" + " MAP: %f" % MAP)
+    logging.info(f" evaluate on {flag}" + ' MRR: %f' % MRR)
     return MAP, MRR
 
 
@@ -177,16 +177,13 @@ def train(model, opt, crit, optimizer, train_data, dev_data, test_data):
             optimizer.step()
             step += 1
             total_loss += batch_loss.data[0]
-            #if(step>=14000 and opt.eval_step!= 200):
-            #    opt.eval_step=200 # make it smaller 2000--->200
-            # opt.eval_step= 10
             if opt.is_ensemble:
                 if step > 60000:
                     break
             if step % opt.eval_step == 0:
                 time_step=datetime.now()-time_epstart
                 print(' Epoch %d Training step %d loss %f this epoch time %s' %(epoch_i, step, total_loss,time_step))
-                with open(opt.task+".txt",'a') as logf:
+                with open(f"{opt.task}.txt", 'a') as logf:
                     logf.write(' Epoch %d Training step %d loss %f this epoch time %s\n' %(epoch_i, step, total_loss,time_step))
                 map_dev, mrr_dev = data_evaluate(model, dev_data, "dev", qrels)
                 #map_test, mrr_test = data_evaluate(model, test_data, "test")
@@ -203,12 +200,12 @@ def train(model, opt, crit, optimizer, train_data, dev_data, test_data):
                     best_mrr_test = mrr_test
                     print ("best dev-- mrr %f map %f; test-- mrr %f map %f" % (
                     best_mrr_dev, best_map_dev, best_mrr_test, best_map_test))
-                    with open(opt.task+".txt",'a') as logf:
-                        logf.write("best dev-- mrr %f map %f; test-- mrr %f map %f\n" % (
-                    best_mrr_dev, best_map_dev, best_mrr_test, best_map_test))
+                    with open(f"{opt.task}.txt", 'a') as logf:
+                            logf.write("best dev-- mrr %f map %f; test-- mrr %f map %f\n" % (
+                        best_mrr_dev, best_map_dev, best_mrr_test, best_map_test))
                 else:
                     print("NOT the best dev-- mrr %f map %f; test-- mrr %f map %f" %(mrr_dev,map_dev,mrr_test,map_test))
-                    with open(opt.task+".txt",'a') as logf:
+                    with open(f"{opt.task}.txt", 'a') as logf:
                         logf.write("NOT the best dev-- mrr %f map %f; test-- mrr %f map %f\n" %(mrr_dev,map_dev,mrr_test,map_test))
                 if opt.save_model:
                     model_state_dict = model.state_dict()
@@ -217,25 +214,25 @@ def train(model, opt, crit, optimizer, train_data, dev_data, test_data):
                         'settings': opt,
                         'epoch': epoch_i}
                     if opt.save_mode == 'all':
-                        model_name = '../chkpt/' + opt.save_model + '_step_{}.chkpt'.format(step)
+                        model_name = f'../chkpt/{opt.save_model}' + f'_step_{step}.chkpt'
                         torch.save(checkpoint, model_name)
                     elif opt.save_mode == 'best':
-                        model_name = '../chkpt/' + opt.save_model + '.chkpt'
+                        model_name = f'../chkpt/{opt.save_model}.chkpt'
                         if map_dev == best_map_dev:
                             best_map_dev = map_dev
                             best_map_test = map_test
                             best_mrr_dev = mrr_dev
                             best_mrr_test = mrr_test
-                            with open(opt.task+".txt",'a') as logf:# record log
+                            with open(f"{opt.task}.txt", 'a') as logf:# record log
                                 logf.write(' Epoch %d Training step %d loss %f this epoch time %s' %(epoch_i, step, report_loss,time_step))
                                 logf.write("best dev-- mrr %f map %f; test-- mrr %f map %f" %(best_mrr_dev, best_map_dev, best_mrr_test, best_map_test))
                             torch.save(checkpoint, model_name)
                             print('    - [Info] The checkpoint file has been updated.')
-                            with open(opt.task+".txt",'a') as logf:
+                            with open(f"{opt.task}.txt", 'a') as logf:
                                 logf.write('    - [Info] The checkpoint file has been updated.\n')
         time_epend=datetime.now()
         time_ep=time_epend-time_epstart
-        print('train epoch '+str(epoch_i)+' using time: '+ str(time_ep))
+        print(f'train epoch {str(epoch_i)} using time: {str(time_ep)}')
 
 
 def kernal_mus(n_kernels):
@@ -250,8 +247,7 @@ def kernal_mus(n_kernels):
 
     bin_size = 2.0 / (n_kernels - 1)  # score range from [-1, 1]
     l_mu.append(1 - bin_size / 2)  # mu: middle of the bin
-    for i in range(1, n_kernels - 1):
-        l_mu.append(l_mu[i] - bin_size)
+    l_mu.extend(l_mu[i] - bin_size for i in range(1, n_kernels - 1))
     return l_mu
 
 
@@ -345,10 +341,10 @@ def main():
         optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad,model.parameters()), lr=opt.lr)
         train(model, opt, crit, optimizer, training_data, validation_data, test_data)
         total_time=datetime.now()-total_time
-        print('trainning completed, using time: ' +str(total_time))
+        print(f'trainning completed, using time: {str(total_time)}')
     elif opt.mode == 'forward':
         print('load pretrained model to forward')
-        if opt.load_model==None:
+        if opt.load_model is None:
             print('error! specify model!')
             exit()
 
@@ -377,7 +373,12 @@ def main():
             test=True,
             cuda=opt.cuda)
 
-        data_forward(model, test_data, '../output/'+opt.task+'_output_%d.txt'%opt.name, '../output/'+opt.task+'_raw_output_%d.txt'%opt.name)
+        data_forward(
+            model,
+            test_data,
+            f'../output/{opt.task}' + '_output_%d.txt' % opt.name,
+            f'../output/{opt.task}' + '_raw_output_%d.txt' % opt.name,
+        )
 
 if __name__ == "__main__":
     main()

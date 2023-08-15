@@ -16,14 +16,12 @@ class DataLoaderTest(object):
 
         self.cuda = cuda
         self.test = test
-        
-        f = open(data)
-        count = 0
-        for count, _ in enumerate(f):
-            pass
-        count += 1
-        f.close()
 
+        with open(data) as f:
+            count = 0
+            for count, _ in enumerate(f):
+                pass
+            count += 1
         self.length = count
 
         self._n_batch = int(np.ceil(self.length / batch_size))
@@ -84,21 +82,21 @@ class DataLoaderTest(object):
                     line = self.data.readline().strip().split('\t')
                     if len(line) < 4:
                         continue
-                        
+
                     query = line[2]
                     doc = line[3]
-                    
+
                     query = cover_text2int(query)
                     doc = cover_text2int(doc)
                     # print(len(query), len(pos), len(neg))
                     if sum(query) == 0 or sum(doc) == 0:
                         continue
-                        
+
                     q_list.append(query)
                     doc_list.append(doc)
                     qid_list.append(line[0])
                     did_list.append(line[1])
-                if len(q_list) != 0:
+                if q_list:
                     break
 
             inst_q, mask_q = pad_to_longest(q_list, 20)
